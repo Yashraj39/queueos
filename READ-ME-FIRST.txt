@@ -1,0 +1,132 @@
+QUEUEOS 3.0 — SMART BANK QUEUE MANAGEMENT SYSTEM
+==============================================
+BEGINNER VERSION: HTML + CSS + JavaScript ONLY
+
+START IN 10 SECONDS
+-------------------
+1. Extract the ZIP file.
+2. Open the QueueOS-Simple-JS folder.
+3. Double-click index.html.
+4. Click "Load demo data".
+5. Use Queue Management, Service Counters, DS Visualizer and Activity History.
+
+You DO NOT need Node.js, React, npm, VS Code extensions, a database,
+or any command in the terminal.
+
+NOTE ABOUT "BACKEND"
+--------------------
+This is a browser-only project. It does not have a separate server.
+The business logic in bank.js serves the role of the "backend logic"
+for this educational simulation. Everything runs on ONE computer/browser.
+If your teacher REQUIRES a separate network backend, you need a server.
+
+PROJECT FILES — ONLY HTML, CSS, JS SOURCE CODE
+----------------------------------------------
+index.html  --> all visible page sections, sidebar, buttons and modal form
+style.css   --> original QueueOS colors, layout, animations, responsive design
+bank.js     --> real data structures + banking business logic
+app.js      --> reads bank.js data, updates the screen, listens to clicks
+
+READ CODE IN THIS ORDER
+-----------------------
+1. index.html: understand WHERE the interface items are defined.
+2. bank.js: understand HOW the bank logic works.
+3. app.js: understand HOW clicking a button calls bank.js.
+4. style.css: understand WHY the webpage looks beautiful.
+
+DATA STRUCTURES — WHERE THEY ARE USED
+-------------------------------------
+
+1) NODE / SINGLY LINKED LIST (bank.js: class Node)
+   Each node stores a customer and a pointer/reference named "next".
+   Example: HEAD -> D-001 -> D-002 -> NULL
+
+2) QUEUE — FIFO (bank.js: class LinkedQueue)
+   enqueue()     : add new customer at tail
+   dequeue()     : remove customer at head
+   enqueueFront(): put a called customer back when Undo is pressed
+   toArray()     : only used to display customers on the screen
+
+3) PRIORITY QUEUE (bank.js: addCustomer(), callNext())
+   Each service has TWO linked queues:
+   - priority: senior citizens / accessibility / pregnancy
+   - regular: everyone else
+   callNext() checks priority first, then regular.
+   Among priority customers, arrival order stays FIFO.
+
+4) STACK — LIFO (bank.js: class Stack, undo())
+   push(): save the latest "Call next" / "Complete" action
+   pop() : remove the most recent saved action
+   undo(): reverse that action
+
+5) LINEAR SEARCH (bank.js: LinkedQueue.findToken())
+   Check one node at a time from HEAD until token is found.
+   Example: search for D-004 across linked-list queues.
+
+6) LINKED-LIST DELETION (bank.js: LinkedQueue.removeToken())
+   Remove one token by changing the previous node's next pointer.
+
+7) INSERTION SORT (bank.js: rankedServices())
+   Sort the four services by number of waiting customers.
+   See the sorted list in the DS Visualizer.
+
+KEY BANK FUNCTIONS (bank.js)
+----------------------------
+addCustomer()  -> generate token and enqueue
+callNext()     -> priority queue dequeue / standard queue dequeue
+complete()     -> mark service finished and push undo stack
+findCustomer() -> linked-list linear search
+removeCustomer()-> linked-list node deletion
+toggleCounter() -> pause / resume service counter
+undo()         -> restore the most recent call / completion
+stats()        -> calculate counters for dashboard
+demo()         -> load 12 ready-made customers
+save() / load()-> save/restore only within THIS browser
+
+HOW BUTTONS CONNECT TO DATA STRUCTURES
+--------------------------------------
+index.html contains a button (for example "Call next").
+app.js has a click listener for that button.
+app.js calls bank.callNext(counterId).
+bank.js removes a customer from the actual linked-list queue.
+app.js calls render() to update the HTML.
+
+The HTML is the visual part. The linked-list operation is NOT faked.
+
+HOW TO DEMONSTRATE TO YOUR PROFESSOR
+-----------------------------------
+1. Click "Load demo data" (12 tokens appear).
+2. Click "DS Visualizer" and show linked nodes for all services.
+3. Click "Service Counters" and "Call next" on Counter 01.
+   --> D-007 (senior citizen) is selected before D-001 (regular).
+4. Click "Complete" and show Completed = 1.
+5. Click "Undo last operation": completed customer comes back.
+6. Click "Undo" again: called customer returns to queue HEAD.
+7. Click "Queue Management" and search for D-001.
+8. Click "Find token" to demonstrate linear linked-list search.
+9. Click "DS Visualizer" to show insertion-sorted busiest services.
+10. Use "Activity History" to show completed customers and events.
+
+TIME COMPLEXITIES (for viva)
+----------------------------
+enqueue()            O(1)
+dequeue()            O(1)
+enqueueFront()       O(1)
+Stack push / pop     O(1)
+Find a token        O(n)
+Remove a token      O(n)
+Insertion sort      O(k^2), k = number of services (4 here)
+
+IMPORTANT LIMITATIONS
+---------------------
+- All data structures run locally in the browser; there is NO server.
+- Data is saved in your browser's localStorage (not a database).
+- Two different computers do not share the same live queue.
+- Data can be cleared by browser privacy settings / site-data cleanup.
+- Estimated waiting time is a simple approximation based on service type.
+- Undo reverses the most recent completed or called customer operation.
+- For real banking production, authentication, privacy, a secure backend,
+  and persistent shared storage would be required.
+
+If you edit a JS file, save it and refresh the page.
+Read the /* ... */ and // comments in each file: they explain each section.

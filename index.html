@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueueOS | Smart Bank Queue Management</title>
+    <!-- CSS = All colors, spacing, layout and responsive design. -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ========== SIDEBAR: navigation (HTML) ========== -->
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">◈</div>
+                <div>queue<span>OS</span><small>BANKING INTELLIGENCE</small></div>
+            </div>
+
+            <div class="nav-label">WORKSPACE</div>
+            <nav>
+                <button class="nav active" data-page="overview">▦ <span>Overview</span></button>
+                <button class="nav" data-page="queue">☷ <span>Queue Management</span></button>
+                <button class="nav" data-page="counters">▤ <span>Service Counters</span></button>
+                <button class="nav" data-page="structures">⌘ <span>DS Visualizer</span></button>
+                <button class="nav" data-page="history">◷ <span>Activity History</span></button>
+            </nav>
+
+            <div class="side-bottom">
+                <div class="system">
+                    <i></i>
+                    <div>
+                        <strong>System operational</strong>
+                        <small>Browser memory engine active</small>
+                    </div>
+                </div>
+                <div class="profile">
+                    <div class="avatar">AD</div>
+                    <div><strong>Admin Dashboard</strong><small>Bank Operations</small></div>
+                    <span>⌄</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div class="breadcrumb">Workspace <span>/</span> <b id="crumb">Overview</b></div>
+                <div class="topright">
+                    <div class="live"><i></i> LIVE SYSTEM</div>
+                    <span id="clock"></span>
+                    <button class="iconbutton" id="refresh" title="Refresh dashboard">↻</button>
+                    <div class="avatar mini">AD</div>
+                </div>
+            </header>
+
+            <div class="content">
+                <div class="heading">
+                    <div>
+                        <div class="eyebrow">BANK OPERATIONS CENTER <span class="eyebrow-line"></span></div>
+                        <h1 id="pageTitle">Good day, Administrator ✳</h1>
+                        <p id="pageSub">Here's what's happening across your branch today.</p>
+                    </div>
+                    <div class="heading-actions">
+                        <button class="btn secondary" id="seed">✦ Load demo data</button>
+                        <button class="btn primary" id="openAdd">＋ New token</button>
+                    </div>
+                </div>
+
+                <!-- STATS are shared by Overview, Queue and Counters. JS fills the numbers. -->
+                <div class="stats" id="statsCards">
+                    <div class="stat">
+                        <div class="stat-top">Customers waiting <div class="stat-icon" style="background:#e9efff;color:#5276ec">☷</div></div>
+                        <div class="stat-value" id="statWaiting">0</div>
+                        <div class="stat-note">Across all service queues</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-top">Currently serving <div class="stat-icon" style="background:#e5f9f3;color:#20b28f">▣</div></div>
+                        <div class="stat-value" id="statServing">0</div>
+                        <div class="stat-note">Active at service counters</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-top">Completed today <div class="stat-icon" style="background:#f0eaff;color:#9073e6">✓</div></div>
+                        <div class="stat-value" id="statCompleted">0</div>
+                        <div class="stat-note">Successfully processed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-top">Estimated avg. wait <div class="stat-icon" style="background:#fff3e5;color:#df9b49">◷</div></div>
+                        <div class="stat-value" id="statWaitTime">0m</div>
+                        <div class="stat-note">Approximate queue workload</div>
+                    </div>
+                </div>
+
+                <!-- ========== PAGE 1: OVERVIEW ========== -->
+                <section class="page" id="overviewPage">
+                    <div class="layout">
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div><h2>Service queue overview</h2><p>Real-time distribution across banking services</p></div>
+                                <button class="link" data-page="queue">Manage queues →</button>
+                            </div>
+                            <div class="service-list" id="overviewServices"></div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div><h2>Counter status</h2><p>Live branch service operations</p></div>
+                                <button class="link" data-page="counters">View counters →</button>
+                            </div>
+                            <div class="counter-list" id="overviewCounters"></div>
+                        </div>
+                    </div>
+                    <div class="layout">
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div><h2>Waiting customers</h2><p>Next in line across all services</p></div>
+                                <button class="link" data-page="queue">View full queue →</button>
+                            </div>
+                            <div class="tablewrap"><table>
+                                <thead><tr><th>Token</th><th>Customer</th><th>Service</th><th>Category</th><th>Joined</th><th>Action</th></tr></thead>
+                                <tbody id="overviewWaiting"></tbody>
+                            </table></div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div><h2>Recent activity</h2><p>Latest queue operations</p></div>
+                                <button class="link" data-page="history">View all →</button>
+                            </div>
+                            <div class="activity" id="overviewEvents"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== PAGE 2: QUEUE MANAGEMENT ========== -->
+                <section class="page hidden" id="queuePage">
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div><h2>Live customer queue</h2><p>Priority customers first, FIFO within each category</p></div>
+                            <div class="queue-search">
+                                <input class="search" id="search" placeholder="Search name or token">
+                                <button class="btn secondary small" id="findToken">Find token</button>
+                            </div>
+                        </div>
+                        <div class="filterbar">
+                            <button class="filter active" data-filter="all">All services</button>
+                            <button class="filter" data-filter="deposit">Cash Deposit</button>
+                            <button class="filter" data-filter="withdrawal">Withdrawal</button>
+                            <button class="filter" data-filter="account">Account Services</button>
+                            <button class="filter" data-filter="loans">Loans &amp; Enquiries</button>
+                        </div>
+                        <div class="tablewrap"><table>
+                            <thead><tr><th>Token</th><th>Customer</th><th>Service</th><th>Category</th><th>Joined</th><th>Action</th></tr></thead>
+                            <tbody id="queueTable"></tbody>
+                        </table></div>
+                    </div>
+                    <div class="sectionbar"><h2>Service-level breakdown</h2></div>
+                    <div class="layout">
+                        <div class="panel">
+                            <div class="panel-head"><div><h2>Service queue overview</h2><p>Waiting customers by service</p></div></div>
+                            <div class="service-list" id="queueServices"></div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-head"><div><h2>Recent activity</h2><p>Latest queue operations</p></div></div>
+                            <div class="activity" id="queueEvents"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== PAGE 3: COUNTERS ========== -->
+                <section class="page hidden" id="countersPage">
+                    <div class="counter-grid" id="counterCards"></div>
+                    <div class="sectionbar">
+                        <h2>Counter operations</h2>
+                        <button class="btn secondary small" id="undoCounter">↶ Undo last operation (<span id="undoCount">0</span>)</button>
+                    </div>
+                    <div class="panel operation-note">
+                        Each counter handles one banking service. <b>Call next</b> takes the first
+                        customer from its priority linked queue, or from its regular queue if
+                        no priority customers remain. <b>Undo</b> uses a stack (last in, first out).
+                    </div>
+                </section>
+
+                <!-- ========== PAGE 4: VISUALIZER ========== -->
+                <section class="page hidden" id="structuresPage">
+                    <div class="panel visual-intro">
+                        <div class="eyebrow">DATA STRUCTURES ENGINE</div>
+                        <h2>Real algorithms. Real queue operations.</h2>
+                        <p>Each service uses two linked-list queues: priority and regular.
+                           Stack is used for Undo, linear search finds tokens, and insertion sort ranks the queues.</p>
+                    </div>
+                    <div class="visual-grid" id="visualQueues"></div>
+                    <div class="visual-grid visual-bottom">
+                        <div class="panel visual-panel">
+                            <h2>↶ Undo stack (LIFO)</h2>
+                            <p>The latest call or completion is reversed first.</p>
+                            <div class="nodes" id="stackNodes"></div>
+                            <button class="btn secondary" id="undoVisual">↶ Pop &amp; undo last operation</button>
+                            <div class="ds-code stack-code">push() → O(1)    pop() → O(1)
+peek() → O(1)
+Linked nodes; TOP points to newest operation</div>
+                        </div>
+                        <div class="panel visual-panel">
+                            <h2>⚡ Algorithm analysis</h2>
+                            <div class="feature"><b>O(1)</b> Add customer at queue tail</div>
+                            <div class="feature"><b>O(1)</b> Serve customer from queue head</div>
+                            <div class="feature"><b>O(n)</b> Search / remove a token</div>
+                            <div class="feature"><b>O(1)</b> Stack push / pop</div>
+                            <div class="feature"><b>O(k²)</b> Insertion sort for k services</div>
+                            <div class="info algorithm-note">Priority customers are served before regular customers.
+                                Within a priority category, the oldest token goes first.</div>
+                        </div>
+                        <div class="panel visual-panel">
+                            <h2>↧ Insertion sort: busiest services first</h2>
+                            <p>The service with the most waiting customers appears first.</p>
+                            <div id="rankedServices"></div>
+                            <div class="ds-code stack-code">Start with the second item.
+Move smaller values one step right.
+Insert the current item into its correct place.
+Time complexity: O(k²)</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== PAGE 5: HISTORY ========== -->
+                <section class="page hidden" id="historyPage">
+                    <div class="layout">
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div><h2>Completed services</h2><p id="completedNote">0 customers served</p></div>
+                                <button class="btn secondary small" id="undoHistory">↶ Undo last</button>
+                            </div>
+                            <div class="tablewrap"><table>
+                                <thead><tr><th>Token</th><th>Customer</th><th>Service</th><th>Category</th><th>Completed</th><th>Counter</th></tr></thead>
+                                <tbody id="historyTable"></tbody>
+                            </table></div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-head"><div><h2>Recent activity</h2><p>Latest operations</p></div></div>
+                            <div class="activity" id="historyEvents"></div>
+                        </div>
+                    </div>
+                    <div class="sectionbar"><h2>Session management</h2></div>
+                    <div class="panel reset-panel">
+                        <div><h3>Reset the demonstration</h3><div>Clear saved queues, counters, history and tokens.</div></div>
+                        <button class="btn danger" id="reset">Reset system</button>
+                    </div>
+                </section>
+
+                <footer>QueueOS <span>•</span> Built with Linked Lists, Queues &amp; Stacks
+                    <span>•</span> No database required <span class="footer-right">ENGINE v3.0.0</span>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========== CUSTOMER REGISTRATION POPUP ========== -->
+    <div class="modal-backdrop hidden" id="modal">
+        <div class="modal">
+            <div class="modal-top">
+                <div>
+                    <div class="eyebrow">CUSTOMER REGISTRATION</div>
+                    <h2>Generate a new token</h2>
+                    <p>Assign a customer to a service queue.</p>
+                </div>
+                <button class="close" id="closeModal">×</button>
+            </div>
+            <form id="customerForm">
+                <label>Customer full name
+                    <input name="name" maxlength="55" required placeholder="e.g. Aarav Patel">
+                </label>
+                <label>Banking service
+                    <select name="service">
+                        <option value="deposit">Cash Deposit</option>
+                        <option value="withdrawal">Withdrawal</option>
+                        <option value="account">Account Services</option>
+                        <option value="loans">Loans &amp; Enquiries</option>
+                    </select>
+                </label>
+                <label>Customer category
+                    <select name="priority">
+                        <option value="regular">Regular — Standard FIFO</option>
+                        <option value="senior">Senior citizen — Priority</option>
+                        <option value="accessible">Accessibility / Pregnancy — Priority</option>
+                    </select>
+                </label>
+                <div class="info">ⓘ Priority customers go first. Inside the priority group, arrival order is preserved.</div>
+                <div class="modal-actions">
+                    <button class="btn secondary" id="cancelModal" type="button">Cancel</button>
+                    <button class="btn primary" type="submit">Generate token →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- JS logic files. NO Node, React, API or npm involved. -->
+    <script src="bank.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
